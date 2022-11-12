@@ -18,6 +18,7 @@ def search_data(id, word, api_key="8265bd1679663a7ea12ac168da84d2e8"):
 
     return fetch_data
 
+@st.cache(suppress_st_warning=True)
 def search_picture(poster_path, api_key="8265bd1679663a7ea12ac168da84d2e8"):
     try:
         fetch_pic = "https://image.tmdb.org/t/p/w500/" + poster_path
@@ -31,7 +32,8 @@ df_display = pd.read_csv("training_data.csv", index_col=0)
 st.markdown("# 🎬 Movie Recommendation System")
 st.markdown("## Welcome, Many of movies to discover. Explore now. 🔍")
 
-selected_movie_name = st.selectbox("Search for a movie...", df_display["title"].values)
+movie_name = sorted(df_display["title"].to_list(), key=str.lower)
+selected_movie_name = st.selectbox("Search for a movie...", movie_name)
 if st.button("Search"):
     with st.container():
         col_detail = st.columns(2)

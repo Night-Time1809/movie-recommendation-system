@@ -32,6 +32,18 @@ st.markdown("# 🎬 Movie Recommendation System")
 st.markdown("## Welcome, Many of movies to discover. Explore now. 🔍")
 
 selected_movie_name = st.selectbox("Search for a movie...", df_display["title"].values)
+if st.button("Search"):
+    with st.container():
+        col_detail = st.columns(2)
+        with col_detail[0]:
+            id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
+            
+            poster_path = search_data(id=id_, word="poster_path")
+            st.image(search_picture(poster_path))
+        with col_detail[1]:
+            st.markdown(f"## {selected_movie_name}")
+        with st.expander("More detail"):
+            st.write("detail")
 
 st.markdown("### What's Popular")
 

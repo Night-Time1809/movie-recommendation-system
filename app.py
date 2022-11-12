@@ -26,123 +26,105 @@ def search_picture(poster_path, api_key="8265bd1679663a7ea12ac168da84d2e8"):
     
     return fetch_pic
 
-df_display = pd.read_csv("display_data.csv", index_col=0)
-df_sorted_vote_avg = df_display[df_display.sort_values(by="vote_avg", ascending=False)["vote_count"] >= 15000]
-df_sorted_vote_count = df_display.sort_values(by="vote_count", ascending=False)
+df_display = pd.read_csv("training_data.csv", index_col=0)
 
-st.title("🎬 Movie Recommendation System")
-st.header("Welcome, Many of movies to discover. Explore now. 🔍")
+st.markdown("# 🎬 Movie Recommendation System")
+st.markdown("## Welcome, Many of movies to discover. Explore now. 🔍")
 
 selected_movie_name = st.selectbox("Search for a movie...", df_display["title"].values)
 
-st.subheader("What's Popular")
+st.markdown("### What's Popular")
+
+def find_platform(platforms, filter_platform):
+    in_platforms = False
+    for i in filter_platform:
+        if i in platforms:
+            in_platforms += True
+    if in_platforms > 0:
+        return True
+    else:
+        return False
+
+def filter(all_data, platforms, year_range, vote_score_range, vote_count_range, sorted_by):
+    filter_data = all_data[all_data["platform"].apply(find_platform, filter_platform=platforms)]
+    filter_data = filter_data[(filter_data["release_date"] >= year_range[0]) & (filter_data["release_date"] <= year_range[1])]
+    filter_data = filter_data[(filter_data["vote_avg"] >= vote_score_range[0]) & (filter_data["vote_avg"] <= vote_score_range[1])]
+    filter_data = filter_data[(filter_data["vote_count"] >= vote_count_range[0]) & (filter_data["vote_count"] <= vote_count_range[1])]
+    filter_data = filter_data.sort_values(by=sorted_by, ascending=False)
+    return filter_data
+
+def show_col_filter(count):
+    col = st.columns(2)
+    with col[0]:
+        st.write("Streaming platform:")
+        netflix = st.checkbox('Netflix', value=True, key=count*1)
+        disney_plus = st.checkbox('Disney+', value=True, key=count*2)
+        amazon_prime = st.checkbox('Amazon Prime', value=True, key=count*3)
+        hulu = st.checkbox('Hulu' , value=True, key=count*4)
+    with col[1]:
+        st.write("Year:")
+        year = st.slider("Select a range of year", 1901, 2023, (2000, 2023), key=count*5)
+
+    st.write(" ")
+    col = st.columns(2)
+    with col[0]:
+        st.write("Vote score:")
+        vote_score = st.slider("Select a range of vote score", 0.0, 10.0, (0.0, 10.0), key=count*6)
+    with col[1]:
+        st.write("Vote count:")
+        vote_count = st.slider("Select a range of vote count", 0, 40000, (15000, 40000), key=count*7)
+
+    filter_platform = []
+    if netflix:
+        filter_platform.append("netflix")
+    if disney_plus:
+        filter_platform.append("disneyplus")
+    if amazon_prime:
+        filter_platform.append("amazonprime")
+    if hulu:
+        filter_platform.append("hulu")
+    return filter_platform, year, vote_score, vote_count
+
+def show_col_movies(df, count_):
+    col = st.columns(3)
+    count = 0
+    button1 = st.button("Show more..", key=count_*8)
+
+    if button1:
+        num = 9
+    else:
+        num = 3
+        
+    for i in range(num):
+        with col[count]:
+            id_ = df["id"].iloc[i]
+            poster_path = search_data(id=id_, word="poster_path")
+
+            st.image(search_picture(poster_path))
+            st.text(df["title"].iloc[i])
+
+            count += 1
+            if (i+1)%3 == 0:
+                count = 0
 
 tab1, tab2 = st.tabs(["Most vote scores", "Most votes"])
 
-# if st.button("Filter"):
-    #     col_1, col_2, col_3 = st.columns(3)
-    #     with col_1:
-    #         st.write("Streaming platform:")
-    #         netflix = st.checkbox('Netflix')
-    #         disney_plus = st.checkbox('Disney+')
-    #         amazon_prime = st.checkbox('Amazon Prime')
-    #         hulu = st.checkbox('Hulu')
-    #     with col_2:
-    #         st.write("Vote score range:")
-    #         values = st.slider("Select a range of vote score", 0.0, 10.0)
-    # else:
-    #     st.write("no")
-
 with tab1:
     with st.expander(""):
-        if st.button("Filter"):
-            col = st.columns(2)
-            with col[0]:
-                st.write("Streaming platform:")
-                netflix = st.checkbox('Netflix', value=True)
-                disney_plus = st.checkbox('Disney+', value=True)
-                amazon_prime = st.checkbox('Amazon Prime', value=True)
-                hulu = st.checkbox('Hulu' , value=True)
-            with col[1]:
-                st.write("Year:")
-                values = st.slider("Select a range of year", 1995, 2020, (1995, 2020))
-
-            st.write(" ")
-            col = st.columns(2)
-            with col[0]:
-                st.write("Vote score:")
-                values = st.slider("Select a range of vote score", 0.0, 10.0, (0.0, 10.0))
-            with col[1]:
-                st.write("Vote count:")
-                values = st.slider("Select a range of vote count", 0.0, 10.0, (0.0, 10.0))
-        # else:
-        #     st.write("no")
-        # st.write("**Filter**")
-        # col = st.columns(3)
-        # with col[0]:
-        #     st.write("Streaming platform:")
-        #     netflix = st.checkbox('Netflix')
-        #     disney_plus = st.checkbox('Disney+')
-        #     amazon_prime = st.checkbox('Amazon Prime')
-        #     hulu = st.checkbox('Hulu')
-
-        col = st.columns(3)
-        count = 0
-        button1 = st.button("Show more..")
-
-        if button1:
-            num = 9
-        else:
-            num = 3
+        st.markdown("#### Filter")      
         
-        for i in range(num):
-            with col[count]:
-                id_ = df_sorted_vote_avg["id"].iloc[i]
-                poster_path = search_data(id=id_, word="poster_path")
+        filter_platform1, year1, vote_score1, vote_count1 = show_col_filter(count=1)
 
-                st.image(search_picture(poster_path))
-                st.text(df_sorted_vote_avg["title"].iloc[i])
+        df_sorted_vote_avg = filter(all_data=df_display, platforms=filter_platform1, year_range=year1, vote_score_range=vote_score1, vote_count_range=vote_count1, sorted_by="vote_avg")
 
-                count += 1
-                if (i+1)%3 == 0:
-                    count = 0
+        show_col_movies(df_sorted_vote_avg, count_=1000)
 
 with tab2:
     with st.expander(""):
-        col = st.columns(3)
-        count = 0
-        button2 = st.button("Show more...")
+        st.markdown("#### Filter")      
+        
+        filter_platform2, year2, vote_score2, vote_count2 = show_col_filter(count=100)
 
-        if button2:
-            num = 9
-        else:
-            num = 3
+        df_sorted_vote_count = filter(all_data=df_display, platforms=filter_platform2, year_range=year2, vote_score_range=vote_score2, vote_count_range=vote_count2, sorted_by="vote_count")
 
-        for i in range(num):
-            with col[count]:
-                id_ = df_sorted_vote_count["id"].iloc[i]
-                poster_path = search_data(id=id_, word="poster_path")
-
-                st.image(search_picture(poster_path))
-                st.text(df_sorted_vote_count["title"].iloc[i])
-
-                count += 1
-                if (i+1)%3 == 0:
-                    count = 0
-
-# st.subheader('Datetime slider')
-
-# start_time = st.slider(
-#      "When do you start?",
-#      value=datetime(2020),
-#      format="YY")
-# st.write("Start time:", start_time)
-
-# st.subheader('Range time slider')
-
-# appointment = st.slider(
-#      "Schedule your appointment:",
-#      value=(time(11, 30), time(12, 45)))
-# st.write("You're scheduled for:", appointment)
-st.write("Vote score range:")
-values = st.slider("Select a range of vote score", 2000, 2020, (2000, 2020))
+        show_col_movies(df_sorted_vote_count, count_=20000)

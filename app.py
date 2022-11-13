@@ -127,18 +127,24 @@ with tab1:
     with st.expander(""):
         st.markdown("#### Filter")      
         
-        filter_platform1, year1, vote_score1, vote_count1 = show_col_filter(count=1)
+        try:
+            filter_platform1, year1, vote_score1, vote_count1 = show_col_filter(count=1)
 
-        df_sorted_vote_avg = filter(all_data=df_display, platforms=filter_platform1, year_range=year1, vote_score_range=vote_score1, vote_count_range=vote_count1, sorted_by="vote_avg")
+            df_sorted_vote_avg = filter(all_data=df_display, platforms=filter_platform1, year_range=year1, vote_score_range=vote_score1, vote_count_range=vote_count1, sorted_by="vote_avg")
 
-        show_col_movies(df_sorted_vote_avg, count_=1000)
+            show_col_movies(df_sorted_vote_avg, count_=1000)
+        except:
+            pass
 
 with tab2:
     with st.expander(""):
         st.markdown("#### Filter")      
         
-        filter_platform2, year2, vote_score2, vote_count2 = show_col_filter(count=100)
+        try:
+            filter_platform2, year2, vote_score2, vote_count2 = show_col_filter(count=100)
 
-        df_sorted_vote_count = filter(all_data=df_display, platforms=filter_platform2, year_range=year2, vote_score_range=vote_score2, vote_count_range=vote_count2, sorted_by="vote_count")
+            df_sorted_vote_count = filter(all_data=df_display, platforms=filter_platform2, year_range=year2, vote_score_range=vote_score2, vote_count_range=vote_count2, sorted_by="vote_count")
 
-        show_col_movies(df_sorted_vote_count, count_=20000)
+            show_col_movies(df_sorted_vote_count, count_=20000)
+        except:
+            pass

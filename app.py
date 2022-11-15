@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 from datetime import datetime, time
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 @st.cache(suppress_st_warning=True)
 def search_data(id, word, api_key="8265bd1679663a7ea12ac168da84d2e8"):
@@ -63,7 +64,6 @@ platform = platform.split()
 vote_count = df_display["vote_count"][df_display["title"] == selected_movie_name].iloc[0]
 director = df_display["crew"][df_display["title"] == selected_movie_name].iloc[0]
 director = format_string(string=director, join_with=", ", space=True)
-st.write(director)
 
 path_pic_platform = []
 for i in platform:
@@ -76,7 +76,6 @@ for i in platform:
     if i == "hulu":
         path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
 
-st.write(path_pic_platform)
 if st.button("Search"):
     with st.container():
         col_detail = st.columns([1,2])
@@ -100,9 +99,12 @@ if st.button("Search"):
         with col_platform[4]:
             st.markdown("**Vote Scores**")
             fig, ax = plt.subplots(figsize=(5, 5))
+            # plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
+            # startangle=90, colors=['#5DADE2', '#515A5A'])
             plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
-            startangle=90, colors=['#5DADE2', '#515A5A'])
-            plt.text(0, 0, f"{round(vote_score*10, 1)}%", ha='center', va='center', fontsize=42)
+            startangle=90, colors=['#21D07A', '#132B18'])
+            plt.text(0, 0, f"{round(vote_score*10, 1)}%", ha='center', va='center', fontsize=42, color="white", weight="bold")
+            fig.set_facecolor("#0E1117")
             st.pyplot(fig)
         with col_platform[5]:
             st.markdown("**Votes**")
@@ -219,3 +221,31 @@ with tab2:
             show_col_movies(df_sorted_vote_count, count_=20000)
         except:
             pass
+
+st.markdown("### Analysing")
+# Weighted Average
+def w_avg(df, values, weights):
+    d = df[values]
+    w = df[weights]
+    return (d * w).sum() / w.sum()
+
+with st.expander(""):
+    try:
+        filter_platform_ana, year_ana, vote_score_ana, vote_count_ana = show_col_filter(count=10000000000)
+
+        df_ana = filter(all_data=df_display, platforms=filter_platform_ana, year_range=year_ana, vote_score_range=vote_score_ana, vote_count_range=vote_count_ana, sorted_by="vote_avg")
+
+        st.write(df_ana.describe())
+
+        st.write("year")
+        df_group_year = df_ana.groupby("release_date").apply(w_avg, "vote_avg", "vote_count")
+        st.write(df_group_year)
+        
+        st.write("platform")
+        st.write(df_ana.groupby("platform").apply(w_avg, "vote_avg", "vote_count"))
+
+        st.write("genre")
+        st.write(df_ana.groupby("genre").apply(w_avg, "vote_avg", "vote_count"))
+
+    except:
+        pass

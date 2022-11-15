@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 from datetime import datetime, time
 
+@st.cache(suppress_st_warning=True)
 def search_data(id, word, api_key="8265bd1679663a7ea12ac168da84d2e8"):
     try:
         if id:
@@ -27,23 +28,50 @@ def search_picture(poster_path, api_key="8265bd1679663a7ea12ac168da84d2e8"):
     
     return fetch_pic
 
+def format_string(string, join_with, space=False):
+    string = string.split()
+    string = [i.strip("[ ] , \'") for i in string]
+    if space:
+        for i in range(len(string)):
+            for j in range(1,len(string[i])):
+                if string[i][j].isupper():
+                    string[i] = string[i][:j] + " " + string[i][j:]
+    string = join_with.join(string)
+    return string
+
 df_display = pd.read_csv("training_data.csv", index_col=0)
+st.write(df_display.head())
 
 st.markdown("# 🎬 Movie Recommendation System")
 st.markdown("## Welcome, Many of movies to discover. Explore now. 🔍")
 
 movie_name = sorted(df_display["title"].to_list(), key=str.lower)
 selected_movie_name = st.selectbox("Search for a movie...", movie_name)
+release_year = df_display["release_date"][df_display["title"] == selected_movie_name].iloc[0]
+genre = df_display["genre"][df_display["title"] == selected_movie_name].iloc[0]
+genre = format_string(string=genre, join_with=", ", space=True)
+runtime = df_display["duration"][df_display["title"] == selected_movie_name].iloc[0]
+runtime = f"{runtime//60}h {runtime%60}m"
+id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
+overview = search_data(id=id_, word="overview")
+tagline = search_data(id=id_, word="tagline")
+
+st.write(tagline)
 if st.button("Search"):
     with st.container():
         col_detail = st.columns(2)
         with col_detail[0]:
-            id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
+            # id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
             
             poster_path = search_data(id=id_, word="poster_path")
             st.image(search_picture(poster_path))
+            
         with col_detail[1]:
-            st.markdown(f"## {selected_movie_name}")
+            st.markdown(f"## {selected_movie_name} ({release_year})")
+            st.markdown(f"{genre} • {runtime}")
+            st.markdown(f"*{tagline}*")
+            st.markdown("##### **Overview**")
+            st.markdown(f"{overview}")
         with st.expander("More detail"):
             st.write("detail")
 

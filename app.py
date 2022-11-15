@@ -3,6 +3,7 @@ import numpy as np
 import requests
 import pandas as pd
 from datetime import datetime, time
+import matplotlib.pyplot as plt
 
 @st.cache(suppress_st_warning=True)
 def search_data(id, word, api_key="8265bd1679663a7ea12ac168da84d2e8"):
@@ -55,20 +56,47 @@ runtime = f"{runtime//60}h {runtime%60}m"
 id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
 overview = search_data(id=id_, word="overview")
 tagline = search_data(id=id_, word="tagline")
+vote_score = df_display["vote_avg"][df_display["title"] == selected_movie_name].iloc[0]
+platform = df_display["platform"][df_display["title"] == selected_movie_name].iloc[0]
+platform = format_string(string=platform, join_with=" ")
+platform = platform.split()
 
-st.write(tagline)
+path_pic_platform = []
+for i in platform:
+    if i == "netflix":
+        path_pic_platform.append("https://www.themoviedb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg")
+    if i == "amazonprime":
+        path_pic_platform.append("https://cdn.lovesavingsgroup.com/logos/amazon-prime.png")
+    if i == "disneyplus":
+        path_pic_platform.append("https://1000logos.net/wp-content/uploads/2021/01/Disney-Plus-logo.jpg")
+    if i == "hulu":
+        path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
+
+st.write(path_pic_platform)
 if st.button("Search"):
     with st.container():
-        col_detail = st.columns(2)
+        col_detail = st.columns([1,2])
         with col_detail[0]:
             # id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
             
             poster_path = search_data(id=id_, word="poster_path")
             st.image(search_picture(poster_path))
+            st.markdown(f"Now streaming on:")
+            for i in path_pic_platform:
+                st.image(i, width=40)
             
         with col_detail[1]:
             st.markdown(f"## {selected_movie_name} ({release_year})")
             st.markdown(f"{genre} • {runtime}")
+            # col_detail_1 = st.columns(2)
+            # with col_detail_1[0]:
+            # fig, ax = plt.subplots(figsize=(6, 6))
+            # plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
+            # startangle=90, colors=['#5DADE2', '#515A5A'])
+            # plt.title("Average User Score", fontsize=24)
+            # plt.text(0, 0, f"{round(vote_score*10, 1)}%", ha='center', va='center', fontsize=42)
+            # st.pyplot(fig)
+
             st.markdown(f"*{tagline}*")
             st.markdown("##### **Overview**")
             st.markdown(f"{overview}")

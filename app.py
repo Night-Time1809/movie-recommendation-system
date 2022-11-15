@@ -60,6 +60,10 @@ vote_score = df_display["vote_avg"][df_display["title"] == selected_movie_name].
 platform = df_display["platform"][df_display["title"] == selected_movie_name].iloc[0]
 platform = format_string(string=platform, join_with=" ")
 platform = platform.split()
+vote_count = df_display["vote_count"][df_display["title"] == selected_movie_name].iloc[0]
+director = df_display["crew"][df_display["title"] == selected_movie_name].iloc[0]
+director = format_string(string=director, join_with=", ", space=True)
+st.write(director)
 
 path_pic_platform = []
 for i in platform:
@@ -76,32 +80,43 @@ st.write(path_pic_platform)
 if st.button("Search"):
     with st.container():
         col_detail = st.columns([1,2])
-        with col_detail[0]:
-            # id_ = df_display["id"][df_display["title"] == selected_movie_name].iloc[0]
-            
+        with col_detail[0]:         
             poster_path = search_data(id=id_, word="poster_path")
             st.image(search_picture(poster_path))
-            st.markdown(f"Now streaming on:")
-            for i in path_pic_platform:
-                st.image(i, width=40)
             
         with col_detail[1]:
             st.markdown(f"## {selected_movie_name} ({release_year})")
             st.markdown(f"{genre} • {runtime}")
-            # col_detail_1 = st.columns(2)
-            # with col_detail_1[0]:
-            # fig, ax = plt.subplots(figsize=(6, 6))
-            # plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
-            # startangle=90, colors=['#5DADE2', '#515A5A'])
-            # plt.title("Average User Score", fontsize=24)
-            # plt.text(0, 0, f"{round(vote_score*10, 1)}%", ha='center', va='center', fontsize=42)
-            # st.pyplot(fig)
 
             st.markdown(f"*{tagline}*")
             st.markdown("##### **Overview**")
             st.markdown(f"{overview}")
+
+        st.markdown(f"Now streaming on:")
+        col_platform = st.columns([1.4, 1.4, 1.4, 1.4, 3, 3, 5])
+        for i in range(len(path_pic_platform)):
+            with col_platform[i]:
+                st.image(path_pic_platform[i])
+        with col_platform[4]:
+            st.markdown("**Vote Scores**")
+            fig, ax = plt.subplots(figsize=(5, 5))
+            plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
+            startangle=90, colors=['#5DADE2', '#515A5A'])
+            plt.text(0, 0, f"{round(vote_score*10, 1)}%", ha='center', va='center', fontsize=42)
+            st.pyplot(fig)
+        with col_platform[5]:
+            st.markdown("**Votes**")
+            st.metric(label="", value=vote_count)
+        with col_platform[6]:
+            st.markdown("**Director**")
+            st.markdown(f"{director}")
+    
         with st.expander("More detail"):
             st.write("detail")
+
+        st.markdown("#### Recommendations")
+        col_rec = st.columns(3)
+        
 
 st.markdown("### What's Popular")
 

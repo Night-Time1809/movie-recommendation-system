@@ -76,7 +76,8 @@ for i in platform:
         # path_pic_platform.append("https://1000logos.net/wp-content/uploads/2021/01/Disney-Plus-logo.jpg")
         path_pic_platform.append("https://www.themoviedb.org/t/p/original/7Fl8ylPDclt3ZYgNbW2t7rbZE9I.jpg")
     if i == "hulu":
-        path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
+        # path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
+        path_pic_platform.append("hulu_logo_3.jpg")
 
 if st.button("Search"):
     with st.container():

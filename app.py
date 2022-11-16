@@ -70,9 +70,11 @@ for i in platform:
     if i == "netflix":
         path_pic_platform.append("https://www.themoviedb.org/t/p/original/t2yyOv40HZeVlLjYsCsPHnWLk4W.jpg")
     if i == "amazonprime":
-        path_pic_platform.append("https://cdn.lovesavingsgroup.com/logos/amazon-prime.png")
+        # path_pic_platform.append("https://cdn.lovesavingsgroup.com/logos/amazon-prime.png")
+        path_pic_platform.append("https://www.themoviedb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg")
     if i == "disneyplus":
-        path_pic_platform.append("https://1000logos.net/wp-content/uploads/2021/01/Disney-Plus-logo.jpg")
+        # path_pic_platform.append("https://1000logos.net/wp-content/uploads/2021/01/Disney-Plus-logo.jpg")
+        path_pic_platform.append("https://www.themoviedb.org/t/p/original/7Fl8ylPDclt3ZYgNbW2t7rbZE9I.jpg")
     if i == "hulu":
         path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
 

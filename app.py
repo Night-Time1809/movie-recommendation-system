@@ -81,7 +81,6 @@ def format_string(string, join_with, space=False):
     return string
 
 df_display = pd.read_csv("training_data.csv", index_col=0)
-st.write(df_display.head())
 
 st.markdown("# 🎬 Movie Recommendation System")
 st.markdown("## Welcome, Many of movies to discover. Explore now. 🔍")
@@ -112,10 +111,6 @@ director = format_string(string=director, join_with=", ", space=True)
 cast, character = search_cast(movie_id=id_)
 cast_id = [search_people_id(name=i) for i in cast]
 cast_pic = [search_picture_people(person_id=i) for i in cast_id]
-# st.write(cast)
-# st.write(character)
-# st.write(cast_id)
-# st.write(cast_pic)
 
 status = search_data(id=id_, word="status")
 language = search_data(id=id_, word="spoken_languages")[0]["english_name"]
@@ -169,6 +164,7 @@ if st.button("Search"):
             st.pyplot(fig)
         with col_platform[5]:
             st.markdown("**Votes**")
+            vote_count = "{:,}".format(vote_count)
             st.metric(label="", value=vote_count)
         with col_platform[6]:
             st.markdown("**Director**")
@@ -205,11 +201,11 @@ if st.button("Search"):
 
                 with col_detail[2]:
                     st.markdown("**Budget**")
-                    st.markdown(f"${budget}")
+                    st.markdown("${:,.2f}".format(budget))
 
                 with col_detail[3]:
                     st.markdown("**Revenue**")
-                    st.markdown(f"${revenue}")
+                    st.markdown("${:,.2f}".format(revenue))
 
         st.markdown("#### Recommendations")
         col_rec = st.columns(3)
@@ -268,30 +264,49 @@ def show_col_filter(count):
         filter_platform.append("hulu")
     return filter_platform, year, vote_score, vote_count
 
-def show_col_movies(df, count_):
-    col = st.columns(3)
-    count = 0
+# def show_col_movies(df, count_):
+#     col = st.columns(3)
+#     count = 0
+#     button1 = st.button("Show more..", key=count_*8)
+
+#     if button1:
+#         num = 9
+#     else:
+#         num = 3
+    
+#     for i in range(num):
+#             with col[count]:
+#                 id_ = df["id"].iloc[i]
+#                 poster_path = search_data(id=id_, word="poster_path")
+
+#                 st.image(search_picture(poster_path))
+#                 st.markdown(df["title"].iloc[i])
+
+#                 count += 1
+#                 if (i+1)%3 == 0:
+#                     count = 0
+
+def show_col_movies(df, count_, num_movie=9):
+    num_pic_inrow = 3
     button1 = st.button("Show more..", key=count_*8)
+    num_row = num_movie//num_pic_inrow
 
     if button1:
-        num = 9
+        num = num_movie
     else:
-        num = 3
-        
-    for i in range(num):
-        with col[count]:
-            id_ = df["id"].iloc[i]
-            poster_path = search_data(id=id_, word="poster_path")
-
-            st.image(search_picture(poster_path))
-            st.text(df["title"].iloc[i])
-
-            count += 1
-            if (i+1)%3 == 0:
-                count = 0
+        num = num_pic_inrow
+    
+    for j in range(num_row):
+        with st.container():
+            col = st.columns(num_pic_inrow)
+            for i in range(num_pic_inrow):
+                with col[i]:
+                    id_ = df["id"].iloc[(num_pic_inrow*j)+i]
+                    poster_path = search_data(id=id_, word="poster_path")
+                    st.image(search_picture(poster_path=poster_path))
+                    st.markdown(df["title"].iloc[(num_pic_inrow*j)+i])
 
 tab1, tab2 = st.tabs(["Most vote scores", "Most votes"])
-
 with tab1:
     with st.expander(""):
         st.markdown("#### Filter")      

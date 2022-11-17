@@ -305,12 +305,12 @@ def show_col_movies(df, count_, num_movie=9):
                     poster_path = search_data(id=id_, word="poster_path")
                     st.image(search_picture(poster_path=poster_path))
                     st.markdown(df["title"].iloc[(num_pic_inrow*j)+i])
-        # if j == 0:
-        #     button1 = st.button("Show more..", key=count_*8)
-        #     if button1:
-        #         continue
-        #     else:
-        #         break
+        
+        # button1 = st.button("Show more..", key=count_*8)
+        # if button1:
+        #     pass
+        # else:
+        #     break
 
 tab1, tab2 = st.tabs(["Most vote scores", "Most votes"])
 with tab1:

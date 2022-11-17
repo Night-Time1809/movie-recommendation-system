@@ -108,8 +108,6 @@ director = format_string(string=director, join_with=", ", space=True)
 # cast = cast.split(", ")
 # cast_id = [search_people_id(name=i) for i in cast]
 # cast_pic = [search_picture_people(person_id=i) for i in cast_id]
-# # st.write(cast)
-# # st.write(cast_pic)
 
 cast, character = search_cast(movie_id=id_)
 cast_id = [search_people_id(name=i) for i in cast]
@@ -118,6 +116,11 @@ cast_pic = [search_picture_people(person_id=i) for i in cast_id]
 # st.write(character)
 # st.write(cast_id)
 # st.write(cast_pic)
+
+status = search_data(id=id_, word="status")
+language = search_data(id=id_, word="spoken_languages")[0]["english_name"]
+budget = search_data(id=id_, word="budget")
+revenue = search_data(id=id_, word="revenue")
 
 path_pic_platform = []
 for i in platform:
@@ -175,46 +178,38 @@ if st.button("Search"):
             st.markdown("#### **Top Billed Cast**")
             num_pic_inrow = 5
             num_row = len(cast) // num_pic_inrow
-            col_cast = st.columns(num_pic_inrow)
+
             for j in range(num_row):
                 with st.container():
+                    col_cast = st.columns(num_pic_inrow)
                     for i in range(num_pic_inrow):
                         with col_cast[i]:
                             try:
                                 st.image(cast_pic[(num_pic_inrow*j)+i])
                             except:
                                 st.image("image/unknown_person.png")
-                            st.markdown(f"""**{cast[(num_pic_inrow*j)+i]}**
+                            st.markdown(f"""**{cast[(num_pic_inrow*j)+i]}**     
                             *{character[(num_pic_inrow*j)+i]}*
                             """)
+            
+            with st.container():
+                st.write("\n")
+                col_detail = st.columns([1,1,1,1])
+                with col_detail[0]:
+                    st.markdown("**Status**")
+                    st.markdown(f"{status}")
 
+                with col_detail[1]:
+                    st.markdown("**Original Language**")
+                    st.markdown(f"{language}")
 
-            # for i in range(len(cast_pic)):
-            #     with col_cast[count]:
-            #         try:
-            #             st.image(cast_pic[i])
-            #         except:
-            #             st.image("image/unknown_person.png")
-            #         st.markdown(f"""**{cast[i]}**
-            #         *{character[i]}*
-            #         """)
-            #     count += 1
-            #     if (i+1)%num_pic_inrow == 0:
-            #         count = 0
-            # with st.container():
-            # for i in range(len(cast_pic)):
-            #     with col_cast[count]:
-            #         try:
-            #             st.image(cast_pic[i])
-            #         except:
-            #             st.image("image/unknown_person.png")
-            #         st.markdown(f"""**{cast[i]}**
-            #         *{character[i]}*
-            #         """)
-            #     count += 1
-            #     if (i+1)%num_pic_inrow == 0:
-            #         count = 0
+                with col_detail[2]:
+                    st.markdown("**Budget**")
+                    st.markdown(f"${budget}")
 
+                with col_detail[3]:
+                    st.markdown("**Revenue**")
+                    st.markdown(f"${revenue}")
 
         st.markdown("#### Recommendations")
         col_rec = st.columns(3)

@@ -30,6 +30,45 @@ def search_picture(poster_path, api_key="8265bd1679663a7ea12ac168da84d2e8"):
     
     return fetch_pic
 
+@st.cache(suppress_st_warning=True)
+def search_people_id(name, api_key="8265bd1679663a7ea12ac168da84d2e8"):
+    try:
+        fetch_name = name.replace(" ", "+")
+        fetch_id = requests.get(f"https://api.themoviedb.org/3/search/person?api_key={api_key}&query={fetch_name}")
+        fetch_id = fetch_id.json()
+        fetch_id = fetch_id["results"][0]["id"]
+    except:
+        fetch_id = None
+
+    return fetch_id
+
+@st.cache(suppress_st_warning=True)
+def search_picture_people(person_id, api_key="8265bd1679663a7ea12ac168da84d2e8"):
+    try:
+        fetch_pic = requests.get(f"https://api.themoviedb.org/3/person/{person_id}/images?api_key={api_key}")
+        fetch_pic = fetch_pic.json()
+        fetch_pic = fetch_pic["profiles"][0]["file_path"]
+        fetch_pic = search_picture(poster_path=fetch_pic)
+    except:
+        fetch_pic = None
+
+    return fetch_pic
+
+@st.cache(suppress_st_warning=True)
+def search_cast(movie_id, num_cast=10, api_key="8265bd1679663a7ea12ac168da84d2e8"):
+    fetch_ = requests.get(f"https://api.themoviedb.org/3/movie/{movie_id}/credits?api_key={api_key}")
+    fetch_ = fetch_.json()
+    fetch_ = fetch_["cast"]
+    cast = []
+    character = []
+    for i in range(num_cast):
+        try:
+            cast.append(fetch_[i]["name"])
+            character.append(fetch_[i]["character"])
+        except:
+            continue
+    return cast, character
+
 def format_string(string, join_with, space=False):
     string = string.split()
     string = [i.strip("[ ] , \'") for i in string]
@@ -64,6 +103,21 @@ platform = platform.split()
 vote_count = df_display["vote_count"][df_display["title"] == selected_movie_name].iloc[0]
 director = df_display["crew"][df_display["title"] == selected_movie_name].iloc[0]
 director = format_string(string=director, join_with=", ", space=True)
+# cast = df_display["cast"][df_display["title"] == selected_movie_name].iloc[0]
+# cast = format_string(string=cast, join_with=", ", space=True)
+# cast = cast.split(", ")
+# cast_id = [search_people_id(name=i) for i in cast]
+# cast_pic = [search_picture_people(person_id=i) for i in cast_id]
+# # st.write(cast)
+# # st.write(cast_pic)
+
+cast, character = search_cast(movie_id=id_)
+cast_id = [search_people_id(name=i) for i in cast]
+cast_pic = [search_picture_people(person_id=i) for i in cast_id]
+# st.write(cast)
+# st.write(character)
+# st.write(cast_id)
+# st.write(cast_pic)
 
 path_pic_platform = []
 for i in platform:
@@ -77,7 +131,7 @@ for i in platform:
         path_pic_platform.append("https://www.themoviedb.org/t/p/original/7Fl8ylPDclt3ZYgNbW2t7rbZE9I.jpg")
     if i == "hulu":
         # path_pic_platform.append("https://assetshuluimcom-a.akamaihd.net/h3o/facebook_share_thumb_default_hulu.jpg")
-        path_pic_platform.append("hulu_logo_3.jpg")
+        path_pic_platform.append("image/hulu_logo_3.jpg")
 
 if st.button("Search"):
     with st.container():
@@ -89,8 +143,9 @@ if st.button("Search"):
         with col_detail[1]:
             st.markdown(f"## {selected_movie_name} ({release_year})")
             st.markdown(f"{genre} • {runtime}")
-
-            st.markdown(f"*{tagline}*")
+            tagline = f"*{tagline}*"
+            if tagline != "**":
+                st.markdown(tagline)
             st.markdown("##### **Overview**")
             st.markdown(f"{overview}")
 
@@ -117,10 +172,53 @@ if st.button("Search"):
             st.markdown(f"{director}")
     
         with st.expander("More detail"):
-            st.write("detail")
+            st.markdown("#### **Top Billed Cast**")
+            num_pic_inrow = 5
+            num_row = len(cast) // num_pic_inrow
+            col_cast = st.columns(num_pic_inrow)
+            for j in range(num_row):
+                with st.container():
+                    for i in range(num_pic_inrow):
+                        with col_cast[i]:
+                            try:
+                                st.image(cast_pic[(num_pic_inrow*j)+i])
+                            except:
+                                st.image("image/unknown_person.png")
+                            st.markdown(f"""**{cast[(num_pic_inrow*j)+i]}**
+                            *{character[(num_pic_inrow*j)+i]}*
+                            """)
+
+
+            # for i in range(len(cast_pic)):
+            #     with col_cast[count]:
+            #         try:
+            #             st.image(cast_pic[i])
+            #         except:
+            #             st.image("image/unknown_person.png")
+            #         st.markdown(f"""**{cast[i]}**
+            #         *{character[i]}*
+            #         """)
+            #     count += 1
+            #     if (i+1)%num_pic_inrow == 0:
+            #         count = 0
+            # with st.container():
+            # for i in range(len(cast_pic)):
+            #     with col_cast[count]:
+            #         try:
+            #             st.image(cast_pic[i])
+            #         except:
+            #             st.image("image/unknown_person.png")
+            #         st.markdown(f"""**{cast[i]}**
+            #         *{character[i]}*
+            #         """)
+            #     count += 1
+            #     if (i+1)%num_pic_inrow == 0:
+            #         count = 0
+
 
         st.markdown("#### Recommendations")
         col_rec = st.columns(3)
+
         
 
 st.markdown("### What's Popular")

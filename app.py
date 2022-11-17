@@ -288,13 +288,13 @@ def show_col_filter(count):
 
 def show_col_movies(df, count_, num_movie=9):
     num_pic_inrow = 3
-    button1 = st.button("Show more..", key=count_*8)
+    # button1 = st.button("Show more..", key=count_*8)
     num_row = num_movie//num_pic_inrow
 
-    if button1:
-        num = num_movie
-    else:
-        num = num_pic_inrow
+    # if button1:
+    #     num_row = num_movie//num_pic_inrow
+    # else:
+    #     num_row = 1
     
     for j in range(num_row):
         with st.container():
@@ -305,6 +305,12 @@ def show_col_movies(df, count_, num_movie=9):
                     poster_path = search_data(id=id_, word="poster_path")
                     st.image(search_picture(poster_path=poster_path))
                     st.markdown(df["title"].iloc[(num_pic_inrow*j)+i])
+        # if j == 0:
+        #     button1 = st.button("Show more..", key=count_*8)
+        #     if button1:
+        #         continue
+        #     else:
+        #         break
 
 tab1, tab2 = st.tabs(["Most vote scores", "Most votes"])
 with tab1:

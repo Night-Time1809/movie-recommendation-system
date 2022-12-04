@@ -7,9 +7,11 @@ import pickle
 from datetime import datetime, time
 import math
 
+@st.cache(suppress_st_warning=True)
 def image_path(poster_path):
     return f"https://image.tmdb.org/t/p/w500{poster_path}"
 
+@st.cache(suppress_st_warning=True)
 def blank_image(picture="movie"):
     if picture == "person":
         pic_path = "image/unknown_person.png"
@@ -34,6 +36,7 @@ if selected_movie_name in duplicated_movie_name["title"].to_list():
     release_date = display_df["release_date"][display_df["title"] == selected_movie_name]
     release_date = release_date.sort_values(ascending=True)
     selected_date = st.radio("Release date:", release_date.dt.strftime('%d-%m-%Y'), horizontal=True)
+    selected_date = datetime.strptime(selected_date, '%d-%m-%Y')
     selected_movie_id = (display_df["id"][(display_df["title"] == selected_movie_name) & (display_df["release_date"] == selected_date)]).iloc[0]
 else:
     selected_movie_id = (display_df["id"][display_df["title"] == selected_movie_name]).iloc[0]
@@ -120,9 +123,12 @@ if st.button("Search"):
                                 else:
                                     cast_pic = blank_image(picture="person")
                                     st.image(cast_pic)
-                                st.markdown(f"""**{cast_name}**     
-                                *{character}*
-                                """)
+                                if character:
+                                    st.markdown(f"""**{cast_name}**     
+                                    *{character}*
+                                    """)
+                                else:
+                                    st.markdown(f"**{cast_name}**")
                 except:
                     continue
 

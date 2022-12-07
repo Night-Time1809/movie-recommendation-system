@@ -282,8 +282,8 @@ def show_col_movies(df, num_movie=9):
                     with col_movie[i]:
                         movie_name = display_dict[movie_id[(num_pic_inrow*j)+i]]["title"]
                         poster_path = display_dict[movie_id[(num_pic_inrow*j)+i]]["poster_path"]
-                        # vote_score = display_dict[movie_id[(num_pic_inrow*j)+i]]["vote_avg"]
-                        # vote_count = display_dict[movie_id[(num_pic_inrow*j)+i]]["vote_count"]
+                        vote_score = display_dict[movie_id[(num_pic_inrow*j)+i]]["vote_avg"]
+                        vote_count = display_dict[movie_id[(num_pic_inrow*j)+i]]["vote_count"]
                         release_date = display_dict[movie_id[(num_pic_inrow*j)+i]]["release_date"]
                         release_date = datetime.strptime(release_date, "%Y-%m-%d").year
                         
@@ -295,8 +295,8 @@ def show_col_movies(df, num_movie=9):
                             st.image(movie_pic)
 
                         st.markdown(f"**{movie_name}** *({release_date})*")
-                        # st.markdown(f"Score: {vote_score}")
-                        # st.markdown(f"Vote: {vote_count}")
+                        st.markdown(f"Score: {vote_score}")
+                        st.markdown(f"Vote: {vote_count}")
                         # fig, ax = plt.subplots(figsize=(2, 2))
                         # plt.pie([vote_score, 10.0-vote_score], wedgeprops={"width":0.3},
                         # startangle=90, colors=['#21D07A', '#132B18'])
@@ -321,7 +321,7 @@ with tab1:
         st.markdown("#### Filter")
         platform1, year1, vote_score1, vote_count1, genre1, ascending1, shown1 = show_col_filter(key=10)
 
-        df_sorted_vote_avg = filter(platform1, year1, vote_score1, vote_count1, genre1, sorted_by="vote_avg", ascending=ascending1)
+        df_sorted_vote_avg = filter(platform1, year1, vote_score1, vote_count1, genre1, sorted_by=["vote_avg", "vote_count", "release_date"], ascending=ascending1)
 
         show_col_movies(df=df_sorted_vote_avg, num_movie=shown1)
 
@@ -330,6 +330,6 @@ with tab2:
         st.markdown("#### Filter")
         platform2, year2, vote_score2, vote_count2, genre2, ascending2, shown2 = show_col_filter(key=20)
 
-        df_sorted_vote_count = filter(platform2, year2, vote_score2, vote_count2, genre2, sorted_by="vote_count", ascending=ascending2)
+        df_sorted_vote_count = filter(platform2, year2, vote_score2, vote_count2, genre2, sorted_by=["vote_count", "vote_avg", "release_date"], ascending=ascending2)
 
         show_col_movies(df=df_sorted_vote_count, num_movie=shown2)

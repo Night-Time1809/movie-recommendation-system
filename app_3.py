@@ -341,4 +341,34 @@ if add_sidebar == "🎬 Movie Recommendation System":
 if add_sidebar == "📊 Movie Analysis":
     st.markdown("# 📊 Movie Analysis")
     st.markdown("## Analysis for release year")
+    vote_notnull_df = display_df[display_df["vote_count"] > 0]
+    vote_notnull_df["release_year"] = vote_notnull_df["release_date"].apply(lambda x: x.year)
+    vote_notnull_df["release_month"] = vote_notnull_df["release_date"].apply(lambda x: x.month)
+
+    revenue_notnull_df = display_df[display_df["revenue"] > 0]
+    revenue_notnull_df["release_year"] = revenue_notnull_df["release_date"].apply(lambda x: x.year)
+    revenue_notnull_df["release_month"] = revenue_notnull_df["release_date"].apply(lambda x: x.month)
     
+    year_vote_ana = vote_notnull_df.groupby("release_year")["vote_count"].mean()
+    year_vote_ana = year_vote_ana.reset_index()
+    st.write(year_vote_ana)
+    fig, ax = plt.subplots()
+    sns.lineplot(x="release_year",
+                y="vote_count",
+                data=year_vote_ana,
+                ax=ax)
+    st.pyplot(fig)
+
+    year_revenue_ana = revenue_notnull_df.groupby("release_year")["revenue"].mean()
+    year_revenue_ana = year_revenue_ana.reset_index()
+    fig, ax = plt.subplots()
+    sns.lineplot(x="release_year",
+                y="revenue",
+                data=year_revenue_ana,
+                ax=ax)
+    st.pyplot(fig)
+    # sns.lineplot(x="release_year",
+    #             y="weighted avg",
+    #         data=year_score,
+    #         ax=ax);
+    # st.write(year_ana)

@@ -5,7 +5,7 @@
 https://user-images.githubusercontent.com/114757125/206863154-80eede53-9ff7-4212-8914-f720068532d6.mp4
 
 This project is divided into 4 parts:
-1. Data fetching from TMDb API
+1. Data fetching from TMDB API
 2. Data preprocessing and feature extraction
 3. Cosine similarity
 4. Deploying on Streamlit app

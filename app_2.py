@@ -135,14 +135,16 @@ def filter(platforms, year_range, vote_score_range, vote_count_range, genres, so
 
     return filter_data
 
-def show_col_movies(df, num_movie=9):
+def show_col_movies(df, num_movie=9, show_num=False):
     num_pic_inrow = 4
     num_row = math.ceil(num_movie / num_pic_inrow)
     movie_id = df["id"].to_list()
     count = 0
 
     st.write(" ")
-    st.markdown(f"1-{num_movie} of {len(df)} results")
+    if show_num:
+        st.markdown(f"1-{num_movie} of {len(df)} results")
+
     for j in range(num_row):
         try:
             with st.container():
@@ -354,7 +356,8 @@ if st.button("Search"):
         
         col_show = st.columns((3, 1))
         col_show[0].markdown("#### Recommendations")
-        show_rec = col_show[1].number_input(f"Show:", value=4, max_value=99)
+        # show_rec = col_show[1].number_input(f"Show:", value=4, max_value=99)
+        show_rec = 8
 
         index_rec, id_rec, similarity = recommend(movie_id=selected_movie_id)
         rec_df = display_df_rec.loc[id_rec]
@@ -371,7 +374,7 @@ with tab1:
 
         df_sorted_vote_avg = filter(platform1, year1, vote_score1, vote_count1, genre1, sorted_by=["vote_avg", "vote_count", "release_date"], ascending=ascending1)
 
-        show_col_movies(df=df_sorted_vote_avg, num_movie=shown1)
+        show_col_movies(df=df_sorted_vote_avg, num_movie=shown1, show_num=True)
 
 with tab2:
     with st.expander(""):
@@ -380,4 +383,4 @@ with tab2:
 
         df_sorted_vote_count = filter(platform2, year2, vote_score2, vote_count2, genre2, sorted_by=["vote_count", "vote_avg", "release_date"], ascending=ascending2)
 
-        show_col_movies(df=df_sorted_vote_count, num_movie=shown2)
+        show_col_movies(df=df_sorted_vote_count, num_movie=shown2, show_num=True)

@@ -7,11 +7,13 @@ import pickle
 from datetime import datetime, time
 import math
 
-@st.cache(suppress_st_warning=True)
+# @st.cache(suppress_st_warning=True)
+@st.cache_data
 def image_path(poster_path):
     return f"https://image.tmdb.org/t/p/w500{poster_path}"
 
-@st.cache(suppress_st_warning=True)
+# @st.cache(suppress_st_warning=True)
+@st.cache_data
 def blank_image(picture="movie"):
     if picture == "person":
         pic_path = "image/unknown_person.png"
